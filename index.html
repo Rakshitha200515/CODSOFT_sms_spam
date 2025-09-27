@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam SMS Detector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8cdda, #1c92d2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            background: #ffffffcc;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            resize: none;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #1c92d2;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0f70a0;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .ham {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .spam {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Spam SMS Detector</h1>
+        <textarea id="sms" rows="5" placeholder="Enter your message here..."></textarea>
+        <br>
+        <button onclick="predict()">Predict</button>
+        <div id="output" class="result"></div>
+        <div class="footer">Powered by Flask & Machine Learning</div>
+    </div>
+
+    <script>
+        async function predict() {
+            const message = document.getElementById('sms').value;
+            const output = document.getElementById('output');
+
+            if (!message.trim()) {
+                output.textContent = "Please enter a message!";
+                output.className = "result";
+                return;
+            }
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+
+                // Only display prediction
+                output.textContent = `Prediction: ${data.prediction}`;
+
+                if (data.prediction.toLowerCase() === 'spam') {
+                    output.className = "result spam";
+                } else {
+                    output.className = "result ham";
+                }
+
+            } catch (error) {
+                output.textContent = "Error predicting message!";
+                output.className = "result";
+            }
+        }
+    </script>
+</body>
+</html>
